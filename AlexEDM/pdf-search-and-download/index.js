@@ -33,7 +33,7 @@ const wait = async (timeout) => new Promise((resolve) => setTimeout(resolve, tim
 async function sendSearchRequest(searchTerms) {
     for (const searchTerm of searchTerms) {
         await handleSearchRequest(searchTerm);
-        await wait(400);
+        await wait(300);
     }
 }
 
@@ -50,25 +50,34 @@ async function handleSearchRequest(searchTerm, page = 1) {
     cookie = cookieRegExp.exec(cookieResult.headers['set-cookie'][0])[1];
 
     console.log(`Searching: ${searchTerm}`);
-    const result = await axios.request(`${searchUrl}?qu=${searchTerm}&Advanced=&sc=%2F&pg=${page}&RankBase=1000`, {
+    try {
+      const result = await axios.request(`${searchUrl}?qu=${searchTerm}&Advanced=&sc=%2F&pg=${page}&RankBase=1000`, {
         method: searchMethod,
         headers: {
-            Cookie: `${cookie}`
+          Cookie: `${cookie}`
         }
-    });
+      });
 
-    return parseSearchResults(result.data, searchTerm, page);
+      return parseSearchResults(result.data, searchTerm, page);
+    } catch(error) {
+      //console.log('Request failed! Trying alternative method.');
+      return parseSearchResults(cookieResult.data, searchTerm, page);
+    }
 }
 
 async function continueSearchRequest(searchTerm, page) {
-    const result = await axios.request(`${searchUrl}?qu=${searchTerm}&Advanced=&sc=%2F&pg=${page}&RankBase=1000`, {
-        method: searchMethod,
-        headers: {
-            Cookie: `${cookie}`
-        }
-    });
+	try {
+		const result = await axios.request(`${searchUrl}?qu=${searchTerm}&Advanced=&sc=%2F&pg=${page}&RankBase=1000`, {
+			method: searchMethod,
+			headers: {
+				Cookie: `${cookie}`
+			}
+		});
 
-    return parseSearchResults(result.data, searchTerm, page);
+		return parseSearchResults(result.data, searchTerm, page);
+	} catch(error) {
+		console.error('Request failed!');
+	}
 }
 
 async function parseSearchResults(result, searchTerm, page) {
