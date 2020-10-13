@@ -1,61 +1,43 @@
 const path = require("path");
-const webpack = require("webpack");
-const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 
-module.exports = (env, argv) => {
-  const config = {
-    mode: "production",
-    entry: ["./src/index.tsx"],
-    target: "node",
-    output: {
-      path: path.resolve(__dirname, "dist"),
-      filename: "index.js"
-    },
-    module: {
-      rules: [
-        {
-          test: /\.(j|t)sx?$/,
-          exclude: /node_modules/,
-          use: {
-            loader: "babel-loader",
-            options: { cacheDirectory: true, cacheCompression: false }
+module.exports = {
+  mode: process.NODE_ENV || "development",
+  entry: "./src",
+  target: "node",
+  output: {
+    path: path.resolve(__dirname, "dist"),
+    filename: "index.js"
+  },
+  module: {
+    rules: [
+      {
+        test: /\.tsx?$/,
+        use: "ts-loader",
+        exclude: /node_modules/
+      },
+      {
+        test: /\.(png|jpe?g|gif|svg)$/i,
+        use: [
+          {
+            loader: "file-loader",
+            options: { publicPath: "dist" }
           }
-        },
-        {
-          test: /\.(png|jpe?g|gif|svg|bmp|otf)$/i,
-          use: [
-            {
-              loader: "file-loader",
-              options: { publicPath: "dist" }
-            }
-          ]
-        },
-        {
-          test: /\.node/i,
-          use: [
-            {
-              loader: "native-addon-loader",
-              options: { name: "[name]-[hash].[ext]" }
-            }
-          ]
-        }
-      ]
-    },
-    plugins: [new CleanWebpackPlugin()],
-    resolve: {
-      extensions: [".tsx", ".ts", ".js", ".jsx", ".json"]
-    }
-  };
-
-  if (argv.mode === "development") {
-    config.mode = "development";
-    config.plugins.push(new webpack.HotModuleReplacementPlugin());
-    config.plugins.push(new ForkTsCheckerWebpackPlugin());
-    config.devtool = "source-map";
-    config.watch = true;
-    config.entry.unshift("webpack/hot/poll?100");
-  }
-
-  return config;
+        ]
+      },
+      {
+        test: /\.node$/,
+        use: [
+          {
+            loader: "native-addon-loader",
+            options: { name: "[name]-[hash].[ext]" }
+          }
+        ]
+      }
+    ]
+  },
+  resolve: {
+    extensions: [".tsx", ".ts", ".js", ".jsx"]
+  },
+  plugins: [new CleanWebpackPlugin()]
 };
