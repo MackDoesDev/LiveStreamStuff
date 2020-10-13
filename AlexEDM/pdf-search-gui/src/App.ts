@@ -2,6 +2,7 @@ import Console from "./Console";
 import {NativeElement, QGridLayout, QIcon, QListWidgetItem, QMainWindow, QStatusBar, QWidget} from "@nodegui/nodegui";
 import Input from "./Input";
 import FileProgressList from "./FileProgressList";
+import FileProgressItem from "./FileProgressItem";
 
 type AppProbs = {
   title: string;
@@ -26,6 +27,8 @@ class App {
     this._input = new Input(this);
     this._fileProgress = new FileProgressList();
 
+    FileProgressItem.console = this._console;
+
     this._mainWindow.setWindowTitle(title);
     this._mainWindow.setWindowIcon(new QIcon(icon));
     this._mainWindow.resize(width, height);
@@ -48,7 +51,7 @@ class App {
   }
 
   onInputChanged(input: Input, text: string) {
-    const items = text.split('\n');
+    const items = text.trim().split('\n');
     this._fileProgress.setItems(items);
   }
 

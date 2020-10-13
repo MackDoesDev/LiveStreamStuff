@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import axios from 'axios';
 import {QListWidgetItem} from "@nodegui/nodegui";
+import Console from './Console';
 
 class FileProgressItem {
   static searchUrl: string = '';
@@ -43,6 +44,7 @@ class FileProgressItem {
   }
 
   async runSearch() {
+    console.log('start searching');
     FileProgressItem.console.log(`Start searching for ${this._text}`);
     const searchResult = await this.requestLegacySearch();
     const cookieRegExp = /^(.*?);/im;

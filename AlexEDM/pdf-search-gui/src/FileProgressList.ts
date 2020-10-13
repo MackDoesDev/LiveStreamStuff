@@ -14,7 +14,11 @@ class FileProgressList extends EventEmitter {
     this._view.setAlternatingRowColors(true);
 
     FileProgressItem.searchUrl = '';
-    FileProgressItem.downloadTargetDirectory = path.join(__dirname, 'download');
+    FileProgressItem.downloadTargetDirectory = path.join(process.cwd(), 'download');
+  }
+
+  async sleep(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   get view() {
@@ -23,15 +27,17 @@ class FileProgressList extends EventEmitter {
 
   async setItems(items: string[]) {
     this._items = [];
+    this._view.clear();
 
     items.forEach(item => {
       const fileProgressItem = new FileProgressItem(item);
-      this._items.push();
+      this._items.push(fileProgressItem);
       this._view.addItem(fileProgressItem.item);
     });
 
     for(const item of this._items) {
       await item.runSearch();
+      await this.sleep(4000);
     }
   }
 }
