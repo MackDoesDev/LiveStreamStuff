@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@nodegui/nodegui": "^0.25.0",
-    "axios": "^0.20.0"
+    "axios": "^0.21.1"
   },
   "devDependencies": {
     "@nodegui/packer": "^1.4.1",
